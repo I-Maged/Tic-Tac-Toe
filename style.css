@@ -20,26 +20,26 @@ table {
   border-collapse: collapse;
   min-height: 70vh;
 }
-td {
+.cell {
   border: 2px solid #000;
   height: 100px;
   width: 100px;
   text-align: center;
   vertical-align: middle;
-  font-size: 70px;
   cursor: pointer;
+  font-size: 70px;
+  text-transform: uppercase;
 }
-table tr:first-child td {
+table tr:first-child .cell {
   border-top: 0;
 }
 
-table tr:last-child td {
+table tr:last-child .cell {
   border-bottom: 0;
 }
-
-table tr td:first-child {
+table tr .cell:first-child {
   border-left: 0;
 }
-table tr td:last-child {
+table tr .cell:last-child {
   border-right: 0;
 }
