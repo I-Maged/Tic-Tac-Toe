@@ -11,7 +11,27 @@ const gameController = (() => {
     [2, 4, 6],
   ];
 
-  const cells = document.querySelectorAll('.cell');
+  const DOMstrings = {
+    cells: document.querySelectorAll('.cell'),
+    gameBtn: document.querySelector('.game-btn'),
+    gameField: document.querySelector('.game-field'),
+    gameOverText: document.querySelector('.game-over-text'),
+    won: document.querySelector('.won-sound'),
+    lost: document.querySelector('.lost-sound'),
+    scoreField: document.querySelector('.display-score'),
+    playerScoreText: document.querySelector('.player-score'),
+    aiScoreText: document.querySelector('.ai-score'),
+  };
+  const setScore = {
+    playerScore: 0,
+    aiScore: 0,
+    incrementPlayerScore: function () {
+      this.playerScore++;
+    },
+    incrementAIScore: function () {
+      this.aiScore++;
+    },
+  };
 
   //check if player or ai won
   function checkWinner(moves) {
@@ -26,35 +46,60 @@ const gameController = (() => {
 
   //if player won
   function playerWon(combo) {
-    cells.forEach((cell) => {
+    DOMstrings.cells.forEach((cell) => {
       combo.forEach((i) => {
         if (i == cell.id) {
           cell.style.background = '#1919fa';
         }
       });
     });
-    document.querySelector('.won-sound').play();
+    setScore.incrementPlayerScore();
+    displayScore();
+    DOMstrings.gameOverText.innerHTML = 'you won!';
+    DOMstrings.won.play();
   }
 
   //if ai won
   function aiWon(combo) {
-    cells.forEach((cell) => {
+    DOMstrings.cells.forEach((cell) => {
       combo.forEach((i) => {
         if (i == cell.id) {
           cell.style.background = '#ff1717';
         }
       });
     });
-    document.querySelector('.lost-sound').play();
+    setScore.incrementAIScore();
+    displayScore();
+    DOMstrings.gameOverText.innerHTML = 'you lost!';
+    DOMstrings.lost.volume = 0.5;
+    DOMstrings.lost.play();
   }
 
-  return { checkWinner, playerWon, aiWon };
+  function draw() {
+    DOMstrings.gameOverText.innerHTML = 'draw!';
+    displayScore();
+  }
+
+  function displayScore() {
+    DOMstrings.playerScoreText.innerHTML = setScore.playerScore;
+    DOMstrings.aiScoreText.innerHTML = setScore.aiScore;
+    DOMstrings.scoreField.style.visibility = 'visible';
+    DOMstrings.gameOverText.style.visibility = 'visible';
+  }
+
+  return {
+    checkWinner,
+    playerWon,
+    aiWon,
+    draw,
+    getDOMstrings: function () {
+      return DOMstrings;
+    },
+  };
 })();
 
 const UIController = ((gameCtrl) => {
-  const cells = document.querySelectorAll('.cell');
-  const gameBtn = document.querySelector('.game-btn');
-  const gameField = document.querySelector('.game-field');
+  const DOM = gameCtrl.getDOMstrings();
   let playerMoves = [];
   let aiMoves = [];
   let playerSign;
@@ -63,10 +108,10 @@ const UIController = ((gameCtrl) => {
   let checkGameOver;
 
   //start new game event
-  gameBtn.addEventListener('click', startNewGame);
+  DOM.gameBtn.addEventListener('click', startNewGame);
 
   //event listener for cell click
-  cells.forEach((cell) => {
+  DOM.cells.forEach((cell) => {
     cell.addEventListener('click', handleCellClick);
   });
 
@@ -103,36 +148,42 @@ const UIController = ((gameCtrl) => {
         currentSign = playerSign;
       }
     }
+    if (aiMoves.length + playerMoves.length >= 9 && !checkGameOver) {
+      gameCtrl.draw();
+      restart();
+    }
   }
 
   function startNewGame() {
     //erase background from start game form
-    gameField.style.background = '';
+    DOM.gameField.style.background = '';
     //set new signs
     playerSign = document.querySelector('#sign').value;
     aiSign = playerSign == 'x' ? 'o' : 'x';
     currentSign = playerSign;
     //remove event listener from new game button
-    gameBtn.removeEventListener('click', startNewGame, false);
+    DOM.gameBtn.removeEventListener('click', startNewGame, false);
     //empty all cells and restarting event listener
-    cells.forEach((cell) => {
+    DOM.cells.forEach((cell) => {
       cell.addEventListener('click', handleCellClick);
       cell.innerHTML = '';
       cell.style.background = '';
     });
+    DOM.scoreField.style.visibility = 'hidden';
+    DOM.gameOverText.style.visibility = 'hidden';
   }
 
   function restart() {
     //set background to start game form
-    gameField.style.background = '#666699';
+    DOM.gameField.style.background = '#666699';
     //remove event listener from cells
-    cells.forEach((cell) => {
+    DOM.cells.forEach((cell) => {
       cell.removeEventListener('click', handleCellClick);
     });
     //starting new game button event listener
     document.querySelector('.game-btn').addEventListener('click', startNewGame);
 
-    //erase allcurrent values from variables
+    //erase all current values from variables
     playerMoves = [];
     aiMoves = [];
     playerSign = '';

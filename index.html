@@ -22,23 +22,36 @@
         <button class="game-btn">Start New Game</button>
       </div>
     </div>
-    <table>
-      <tr>
-        <td class="cell" id="0"></td>
-        <td class="cell" id="1"></td>
-        <td class="cell" id="2"></td>
-      </tr>
-      <tr>
-        <td class="cell" id="3"></td>
-        <td class="cell" id="4"></td>
-        <td class="cell" id="5"></td>
-      </tr>
-      <tr>
-        <td class="cell" id="6"></td>
-        <td class="cell" id="7"></td>
-        <td class="cell" id="8"></td>
-      </tr>
-    </table>
+    <section class="main">
+      <div class="game-over-text"></div>
+      <table>
+        <tr>
+          <td class="cell" id="0"></td>
+          <td class="cell" id="1"></td>
+          <td class="cell" id="2"></td>
+        </tr>
+        <tr>
+          <td class="cell" id="3"></td>
+          <td class="cell" id="4"></td>
+          <td class="cell" id="5"></td>
+        </tr>
+        <tr>
+          <td class="cell" id="6"></td>
+          <td class="cell" id="7"></td>
+          <td class="cell" id="8"></td>
+        </tr>
+      </table>
+      <div class="display-score">
+        <div class="player">
+          <div class="player-title">player</div>
+          <div class="player-score"></div>
+        </div>
+        <div class="ai">
+          <div class="ai-title">ai</div>
+          <div class="ai-score"></div>
+        </div>
+      </div>
+    </section>
     <audio class="won-sound" src="./sfx/winSFX.mp3"></audio>
     <audio class="lost-sound" src="./sfx/lossSFX.mp3"></audio>
     <script src="./script.js" async defer></script>
