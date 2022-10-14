@@ -10,6 +10,18 @@
   </head>
   <body>
     <h1>Tic Tac Toe</h1>
+    <div class="game-field">
+      <div class="input-field">
+        <label for="sign">Choose your sign</label>
+        <select name="sign" id="sign">
+          <option value="x">X</option>
+          <option value="o">O</option>
+        </select>
+      </div>
+      <div class="input-btn">
+        <button class="game-btn">Start New Game</button>
+      </div>
+    </div>
     <table>
       <tr>
         <td class="cell" id="0"></td>
@@ -27,6 +39,8 @@
         <td class="cell" id="8"></td>
       </tr>
     </table>
+    <audio class="won-sound" src="./sfx/winSFX.mp3"></audio>
+    <audio class="lost-sound" src="./sfx/lossSFX.mp3"></audio>
     <script src="./script.js" async defer></script>
   </body>
 </html>

@@ -13,12 +13,50 @@ h1 {
   font-size: 80px;
   text-align: center;
 }
+.game-field {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+.input-field,
+.input-btn {
+  margin: 20px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+.input-field label {
+  font-size: 18px;
+}
+.input-field select {
+  padding: 3px 6px;
+  font-size: 16px;
+  outline: none;
+  border: 3px solid #000;
+  border-radius: 10px;
+}
+button {
+  padding: 4px 8px;
+  font-size: 18px;
+  border-radius: 10px;
+  border: 3px solid #000;
+  transition: 0.3s ease-in-out;
+}
+button:active {
+  position: relative;
+  top: 3px;
+}
+button:hover,
+.remove-btn:hover {
+  scale: 1.1;
+}
 table {
   display: flex;
   justify-content: center;
   align-items: center;
   border-collapse: collapse;
-  min-height: 70vh;
+  margin-top: 80px;
 }
 .cell {
   border: 2px solid #000;
