@@ -14,6 +14,7 @@ const gameController = (() => {
   //get all dom strings
   const DOMstrings = {
     cells: document.querySelectorAll('.cell'),
+    cellsArray: Array.from(document.querySelectorAll('.cell')),
     gameBtn: document.querySelector('.game-btn'),
     gameField: document.querySelector('.game-field'),
     gameOverText: document.querySelector('.game-over-text'),
@@ -56,17 +57,16 @@ const gameController = (() => {
     return check;
   }
 
+  //generate random move for easy mode
   function easyMode() {
-    let move;
-    function generateNumber() {
+    let move = 0;
+    for (let index = 0; index < 100; index++) {
       move = Math.floor(Math.random() * 9);
-      return move;
+      if (DOMstrings.cellsArray[move].innerHTML == '') {
+        break;
+      }
     }
-    if (DOMstrings.cells[move].innerHTML == '') {
-      return move;
-    } else {
-      generateNumber();
-    }
+    return move;
   }
 
   //if player won
@@ -75,7 +75,6 @@ const gameController = (() => {
       combo.forEach((i) => {
         if (i == cell.id) {
           cell.style.background = '#1919fa';
-          console.log(cell.innerHTML);
         }
       });
     });
@@ -131,7 +130,9 @@ const gameController = (() => {
 })();
 
 const UIController = ((gameCtrl) => {
+  //get dom strings
   const DOM = gameCtrl.getDOMstrings();
+  //get input variables
   const INPUT = gameCtrl.getGameInput();
 
   //start new game event
@@ -142,12 +143,13 @@ const UIController = ((gameCtrl) => {
     cell.addEventListener('click', handleCellClick);
   });
 
+  //handles player's click
   function handleCellClick(cell) {
     //check if cell is empty
     if (cell.target.innerHTML != '') {
       return;
     } else if (INPUT.currentSign == INPUT.playerSign) {
-      //add move to player array
+      //add move to UI & player array
       cell.target.innerHTML = INPUT.playerSign;
       INPUT.playerMoves.push(Number(cell.target.id));
       //check if player won
@@ -156,35 +158,53 @@ const UIController = ((gameCtrl) => {
         //game over if player won
         gameCtrl.playerWon(INPUT.checkGameOver);
         restart();
+        return;
       } else {
         //or change sign and continue
         INPUT.currentSign = INPUT.aiSign;
       }
-    } else if (INPUT.currentSign == INPUT.aiSign) {
-      let esayMove = gameCtrl.easyMode();
-      //add move to ai array
-      cell.target.innerHTML = INPUT.aiSign;
-      INPUT.aiMoves.push(Number(cell.target.id));
-      //check if player won
-      INPUT.checkGameOver = gameCtrl.checkWinner(INPUT.aiMoves);
-      if (INPUT.checkGameOver) {
-        //game over if ai won
-        gameCtrl.aiWon(INPUT.checkGameOver);
-        restart();
-      } else {
-        //or change sign and continue
-        INPUT.currentSign = INPUT.playerSign;
-      }
     }
+    //check for draw
     if (
       INPUT.aiMoves.length + INPUT.playerMoves.length >= 9 &&
       !INPUT.checkGameOver
     ) {
       gameCtrl.draw();
       restart();
+      return;
     }
+    easyturn();
   }
 
+  //handles ai turn
+  function easyturn() {
+    //get random number for an empty cell
+    let esayMove = gameCtrl.easyMode();
+
+    //add move to UI & ai array
+    DOM.cellsArray[esayMove].innerHTML = INPUT.aiSign;
+    INPUT.aiMoves.push(esayMove);
+    //check if ai won
+    INPUT.checkGameOver = gameCtrl.checkWinner(INPUT.aiMoves);
+    if (INPUT.checkGameOver) {
+      //game over if ai won
+      gameCtrl.aiWon(INPUT.checkGameOver);
+      restart();
+      return;
+    } else {
+      //or change sign and continue
+      INPUT.currentSign = INPUT.playerSign;
+    }
+    //check for draw
+    if (
+      INPUT.aiMoves.length + INPUT.playerMoves.length >= 9 &&
+      !INPUT.checkGameOver
+    ) {
+      gameCtrl.draw();
+      restart();
+      return;
+    }
+  }
   function startNewGame() {
     //erase background from start game form
     DOM.gameField.style.background = '';
