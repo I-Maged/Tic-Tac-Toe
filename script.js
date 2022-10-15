@@ -11,6 +11,7 @@ const gameController = (() => {
     [2, 4, 6],
   ];
 
+  //get all dom strings
   const DOMstrings = {
     cells: document.querySelectorAll('.cell'),
     gameBtn: document.querySelector('.game-btn'),
@@ -22,6 +23,17 @@ const gameController = (() => {
     playerScoreText: document.querySelector('.player-score'),
     aiScoreText: document.querySelector('.ai-score'),
   };
+  //set all input variables
+  const setGameInput = {
+    playerMoves: [],
+    aiMoves: [],
+    playerSign: '',
+    aiSign: '',
+    currentSign: '',
+    checkGameOver: '',
+  };
+
+  //to handle score
   const setScore = {
     playerScore: 0,
     aiScore: 0,
@@ -44,12 +56,26 @@ const gameController = (() => {
     return check;
   }
 
+  function easyMode() {
+    let move;
+    function generateNumber() {
+      move = Math.floor(Math.random() * 9);
+      return move;
+    }
+    if (DOMstrings.cells[move].innerHTML == '') {
+      return move;
+    } else {
+      generateNumber();
+    }
+  }
+
   //if player won
   function playerWon(combo) {
     DOMstrings.cells.forEach((cell) => {
       combo.forEach((i) => {
         if (i == cell.id) {
           cell.style.background = '#1919fa';
+          console.log(cell.innerHTML);
         }
       });
     });
@@ -75,11 +101,13 @@ const gameController = (() => {
     DOMstrings.lost.play();
   }
 
+  //if ended in a draw
   function draw() {
     DOMstrings.gameOverText.innerHTML = 'draw!';
     displayScore();
   }
 
+  //handles displaying score after game over
   function displayScore() {
     DOMstrings.playerScoreText.innerHTML = setScore.playerScore;
     DOMstrings.aiScoreText.innerHTML = setScore.aiScore;
@@ -92,20 +120,19 @@ const gameController = (() => {
     playerWon,
     aiWon,
     draw,
+    easyMode,
     getDOMstrings: function () {
       return DOMstrings;
+    },
+    getGameInput: function () {
+      return setGameInput;
     },
   };
 })();
 
 const UIController = ((gameCtrl) => {
   const DOM = gameCtrl.getDOMstrings();
-  let playerMoves = [];
-  let aiMoves = [];
-  let playerSign;
-  let aiSign;
-  let currentSign;
-  let checkGameOver;
+  const INPUT = gameCtrl.getGameInput();
 
   //start new game event
   DOM.gameBtn.addEventListener('click', startNewGame);
@@ -119,36 +146,40 @@ const UIController = ((gameCtrl) => {
     //check if cell is empty
     if (cell.target.innerHTML != '') {
       return;
-    } else if (currentSign == playerSign) {
+    } else if (INPUT.currentSign == INPUT.playerSign) {
       //add move to player array
-      cell.target.innerHTML = playerSign;
-      playerMoves.push(Number(cell.target.id));
+      cell.target.innerHTML = INPUT.playerSign;
+      INPUT.playerMoves.push(Number(cell.target.id));
       //check if player won
-      checkGameOver = gameCtrl.checkWinner(playerMoves);
-      if (checkGameOver) {
+      INPUT.checkGameOver = gameCtrl.checkWinner(INPUT.playerMoves);
+      if (INPUT.checkGameOver) {
         //game over if player won
-        gameCtrl.playerWon(checkGameOver);
+        gameCtrl.playerWon(INPUT.checkGameOver);
         restart();
       } else {
         //or change sign and continue
-        currentSign = aiSign;
+        INPUT.currentSign = INPUT.aiSign;
       }
-    } else if (currentSign == aiSign) {
+    } else if (INPUT.currentSign == INPUT.aiSign) {
+      let esayMove = gameCtrl.easyMode();
       //add move to ai array
-      cell.target.innerHTML = aiSign;
-      aiMoves.push(Number(cell.target.id));
+      cell.target.innerHTML = INPUT.aiSign;
+      INPUT.aiMoves.push(Number(cell.target.id));
       //check if player won
-      checkGameOver = gameCtrl.checkWinner(aiMoves);
-      if (checkGameOver) {
+      INPUT.checkGameOver = gameCtrl.checkWinner(INPUT.aiMoves);
+      if (INPUT.checkGameOver) {
         //game over if ai won
-        gameCtrl.aiWon(checkGameOver);
+        gameCtrl.aiWon(INPUT.checkGameOver);
         restart();
       } else {
         //or change sign and continue
-        currentSign = playerSign;
+        INPUT.currentSign = INPUT.playerSign;
       }
     }
-    if (aiMoves.length + playerMoves.length >= 9 && !checkGameOver) {
+    if (
+      INPUT.aiMoves.length + INPUT.playerMoves.length >= 9 &&
+      !INPUT.checkGameOver
+    ) {
       gameCtrl.draw();
       restart();
     }
@@ -158,9 +189,9 @@ const UIController = ((gameCtrl) => {
     //erase background from start game form
     DOM.gameField.style.background = '';
     //set new signs
-    playerSign = document.querySelector('#sign').value;
-    aiSign = playerSign == 'x' ? 'o' : 'x';
-    currentSign = playerSign;
+    INPUT.playerSign = document.querySelector('#sign').value;
+    INPUT.aiSign = INPUT.playerSign == 'x' ? 'o' : 'x';
+    INPUT.currentSign = INPUT.playerSign;
     //remove event listener from new game button
     DOM.gameBtn.removeEventListener('click', startNewGame, false);
     //empty all cells and restarting event listener
@@ -169,6 +200,8 @@ const UIController = ((gameCtrl) => {
       cell.innerHTML = '';
       cell.style.background = '';
     });
+
+    //hides score and after after staarting new game
     DOM.scoreField.style.visibility = 'hidden';
     DOM.gameOverText.style.visibility = 'hidden';
   }
@@ -184,12 +217,12 @@ const UIController = ((gameCtrl) => {
     document.querySelector('.game-btn').addEventListener('click', startNewGame);
 
     //erase all current values from variables
-    playerMoves = [];
-    aiMoves = [];
-    playerSign = '';
-    aiSign = '';
-    currentSign = '';
-    checkGameOver = '';
+    INPUT.playerMoves = [];
+    INPUT.aiMoves = [];
+    INPUT.playerSign = '';
+    INPUT.aiSign = '';
+    INPUT.currentSign = '';
+    INPUT.checkGameOver = '';
   }
 
   return {
